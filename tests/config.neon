@@ -1,0 +1,7 @@
+parameters:
+
+extensions:
+	- Doublemcz\NetteDoctrineOdm\DI\GeneratorExtension
+
+doctrineOdm:
+	database: 'nette-doctrine-odm'
