@@ -1,3 +1,3 @@
 <?php
 
-namespace Doublemcz\NetteDoctrineOdm\Generators;
+namespace Doublemcz\NetteDoctrineOdm\Exceptions;

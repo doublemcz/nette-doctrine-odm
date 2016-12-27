@@ -1,7 +1,6 @@
 tests/php-win-doublem.ini
 tests/temp/*
+vendor
 
-/vendor/
-.idea/dictionaries/
-.idea/workspace.xml
+.idea
 !.gitkeep

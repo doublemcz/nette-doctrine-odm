@@ -5,7 +5,7 @@ namespace Doublemcz\NetteDoctrineOdm\DI;
 use Nette;
 use Doublemcz;
 
-class GeneratorExtension extends Nette\DI\CompilerExtension
+class OdmExtension extends Nette\DI\CompilerExtension
 {
 	/**
 	 * @var array
@@ -23,7 +23,7 @@ class GeneratorExtension extends Nette\DI\CompilerExtension
 	 */
 	public function loadConfiguration()
 	{
-		//$this->name = 'doctrine.odm';
+//		$this->name = 'doctrineOdm';
 		$config = $this->getConfig();
 		$builder = $this->getContainerBuilder();
 
@@ -38,13 +38,13 @@ class GeneratorExtension extends Nette\DI\CompilerExtension
 
 		$configuration = $builder->addDefinition($this->prefix('configuration'))
 			->setClass('Doctrine\ODM\MongoDB\Configuration')
-			->addSetup('setProxyDir', $config['proxyDir'])
-			->addSetup('setProxyNamespace', $config['proxyNamespace'])
-			->addSetup('setHydratorNamespace', $config['hydratorNamespace'])
-			->addSetup('setMetadataDriverImpl', '@' . $this->prefix('anotationDriver'));
+			->addSetup('setProxyDir', [$config['proxyDir']])
+			->addSetup('setProxyNamespace', [$config['proxyNamespace']])
+			->addSetup('setHydratorNamespace', [$config['hydratorNamespace']])
+			->addSetup('setMetadataDriverImpl', ['@' . $this->prefix('anotationDriver')]);
 
-		if ($config['database']) {
-			$configuration->addSetup('setDefaultDB', $config['database']);
+		if (array_key_exists('database', $config)) {
+			$configuration->addSetup('setDefaultDB', [$config['database']]);
 		}
 
 		$builder->addDefinition($this->prefix('documentManager'))
@@ -57,5 +57,15 @@ class GeneratorExtension extends Nette\DI\CompilerExtension
 	public function getConfig()
 	{
 		return parent::getConfig($this->defaults);
+	}
+
+	/**
+	 * @param \Nette\Configurator $configurator
+	 */
+	public static function register(Nette\Configurator $configurator)
+	{
+		$configurator->onCompile[] = function ($config, Nette\DI\Compiler $compiler) {
+			$compiler->addExtension('doctrineOdm', new OdmExtension());
+		};
 	}
 }
