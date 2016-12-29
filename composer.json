@@ -1,5 +1,5 @@
 {
-  "name": "doublemcz/nette-doctrie-odm",
+  "name": "doublemcz/nette-doctrine-odm",
   "type": "library",
   "license": "MIT",
   "require": {
