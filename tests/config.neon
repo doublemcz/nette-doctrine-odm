@@ -1,6 +1,5 @@
 extensions:
-	- Doublemcz\NetteDoctrineOdm\DI\OdmExtension
+	- Doublemcz\NetteDoctrineOdm\DI\DoctrineOdmExtension
 
-parameters:
-	doctrineOdm:
-		database: 'nette-doctrine-odm'
+#doctrineOdm:
+#	database: 'nette-doctrine-odm'

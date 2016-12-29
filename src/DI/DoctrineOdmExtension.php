@@ -5,14 +5,16 @@ namespace Doublemcz\NetteDoctrineOdm\DI;
 use Nette;
 use Doublemcz;
 
-class OdmExtension extends Nette\DI\CompilerExtension
+class DoctrineOdmExtension extends Nette\DI\CompilerExtension
 {
+
 	/**
 	 * @var array
 	 */
 	public $defaults = [
 		'proxyDir' => '%tempDir%/proxies',
 		'proxyNamespace' => 'Proxies',
+		'hydratorDir' => '%tempDir%/hydrators',
 		'hydratorNamespace' => 'Hydrators',
 		'documentsDir' => '%appDir%/model/Documents'
 	];
@@ -23,15 +25,14 @@ class OdmExtension extends Nette\DI\CompilerExtension
 	 */
 	public function loadConfiguration()
 	{
-//		$this->name = 'doctrineOdm';
 		$config = $this->getConfig();
 		$builder = $this->getContainerBuilder();
 
-		//AnnotationDriver::registerAnnotationClasses();
-
 		$builder->addDefinition($this->prefix('annotationDriver'))
-			->setClass('Doctrine\ODM\MongoDB\Mapping\Driver\AnnotationDriver::create', [$config['documentsDir']]);
-
+			->setFactory(
+				'Doctrine\ODM\MongoDB\Mapping\Driver\AnnotationDriver::create',
+				[$config['documentsDir']]
+			);
 
 		$builder->addDefinition($this->prefix('connection'))
 			->setClass('Doctrine\MongoDB\Connection');
@@ -39,16 +40,29 @@ class OdmExtension extends Nette\DI\CompilerExtension
 		$configuration = $builder->addDefinition($this->prefix('configuration'))
 			->setClass('Doctrine\ODM\MongoDB\Configuration')
 			->addSetup('setProxyDir', [$config['proxyDir']])
+			->addSetup('setHydratorDir', [$config['hydratorDir']])
 			->addSetup('setProxyNamespace', [$config['proxyNamespace']])
 			->addSetup('setHydratorNamespace', [$config['hydratorNamespace']])
-			->addSetup('setMetadataDriverImpl', ['@' . $this->prefix('anotationDriver')]);
+			->addSetup('setMetadataDriverImpl', ['@' . $this->prefix('annotationDriver')]);
 
 		if (array_key_exists('database', $config)) {
 			$configuration->addSetup('setDefaultDB', [$config['database']]);
 		}
 
 		$builder->addDefinition($this->prefix('documentManager'))
-			->setClass('DocumentManager::create', ['@' . $this->prefix('connection'), '@' . $this->prefix('configuration')]);
+			->setFactory(
+				'Doctrine\ODM\MongoDB\DocumentManager::create',
+				['@' . $this->prefix('connection'), '@' . $this->prefix('configuration')]
+			);
+	}
+
+	/**
+	 * @param Nette\PhpGenerator\ClassType $class
+	 */
+	public function afterCompile(Nette\PhpGenerator\ClassType $class)
+	{
+		$initialize = $class->methods['initialize'];
+		$initialize->addBody('Doctrine\ODM\MongoDB\Mapping\Driver\AnnotationDriver::registerAnnotationClasses();');
 	}
 
 	/**
@@ -59,13 +73,4 @@ class OdmExtension extends Nette\DI\CompilerExtension
 		return parent::getConfig($this->defaults);
 	}
 
-	/**
-	 * @param \Nette\Configurator $configurator
-	 */
-	public static function register(Nette\Configurator $configurator)
-	{
-		$configurator->onCompile[] = function ($config, Nette\DI\Compiler $compiler) {
-			$compiler->addExtension('doctrineOdm', new OdmExtension());
-		};
-	}
 }
