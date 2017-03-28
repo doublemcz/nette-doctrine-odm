@@ -16,9 +16,9 @@ class DoctrineOdmExtension extends Nette\DI\CompilerExtension
 		'proxyNamespace' => 'Proxies',
 		'hydratorDir' => '%tempDir%/hydrators',
 		'hydratorNamespace' => 'Hydrators',
-		'documentsDir' => '%appDir%/model/Documents'
+		'documentsDir' => '%appDir%/model/Documents',
+		'loggerClass' => 'Doublemcz\NetteDoctrineOdm\Logger'
 	];
-
 
 	/**
 	 * @inheritdoc
@@ -34,6 +34,9 @@ class DoctrineOdmExtension extends Nette\DI\CompilerExtension
 				[$config['documentsDir']]
 			);
 
+		$builder->addDefinition($this->prefix('logger'))
+			->setClass($config['loggerClass']);
+
 		$builder->addDefinition($this->prefix('connection'))
 			->setClass('Doctrine\MongoDB\Connection');
 
@@ -43,7 +46,8 @@ class DoctrineOdmExtension extends Nette\DI\CompilerExtension
 			->addSetup('setHydratorDir', [$config['hydratorDir']])
 			->addSetup('setProxyNamespace', [$config['proxyNamespace']])
 			->addSetup('setHydratorNamespace', [$config['hydratorNamespace']])
-			->addSetup('setMetadataDriverImpl', ['@' . $this->prefix('annotationDriver')]);
+			->addSetup('setMetadataDriverImpl', ['@' . $this->prefix('annotationDriver')])
+			->addSetup('setLoggerCallable', ['@' . $this->prefix('logger') . '::log']);
 
 		if (array_key_exists('database', $config)) {
 			$configuration->addSetup('setDefaultDB', [$config['database']]);
