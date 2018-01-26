@@ -12,6 +12,7 @@ class DoctrineOdmExtension extends Nette\DI\CompilerExtension
 	 * @var array
 	 */
 	public $defaults = [
+		'server' => 'mongodb://localhost:27017',
 		'proxyDir' => '%tempDir%/proxies',
 		'proxyNamespace' => 'Proxies',
 		'hydratorDir' => '%tempDir%/hydrators',
@@ -38,7 +39,7 @@ class DoctrineOdmExtension extends Nette\DI\CompilerExtension
 			->setClass($config['loggerClass']);
 
 		$builder->addDefinition($this->prefix('connection'))
-			->setClass('Doctrine\MongoDB\Connection');
+			->setClass('Doctrine\MongoDB\Connection', [$config['server']]);
 
 		$configuration = $builder->addDefinition($this->prefix('configuration'))
 			->setClass('Doctrine\ODM\MongoDB\Configuration')
@@ -52,6 +53,7 @@ class DoctrineOdmExtension extends Nette\DI\CompilerExtension
 		if (array_key_exists('database', $config)) {
 			$configuration->addSetup('setDefaultDB', [$config['database']]);
 		}
+
 
 		$builder->addDefinition($this->prefix('documentManager'))
 			->setFactory(
