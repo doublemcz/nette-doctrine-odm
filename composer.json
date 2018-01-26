@@ -4,9 +4,7 @@
   "license": "MIT",
   "require": {
     "php": ">=7.0.0",
-    "alcaeus/mongo-php-adapter": "^1.0",
-    "mongodb/mongodb": "^1.0",
-    "doctrine/mongodb-odm": "^1.1",
+    "doctrine/mongodb-odm": "*",
     "nette/di": "^2.3.0",
     "kdyby/console": "^2.6.0"
   },
