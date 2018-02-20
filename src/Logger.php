@@ -4,8 +4,10 @@ namespace Doublemcz\NetteDoctrineOdm;
 
 use Nette;
 
-class Logger extends Nette\Object
+class Logger
 {
+
+	use Nette\SmartObject;
 
 	private $queries = [];
 
